@@ -31,32 +31,24 @@ Dans le cadre du suivi des utilisateurs et du taux d'engagement de Mini Docto+, 
 ## 🚀 Guide d'Installation et de Démarrage
 
 ### 1. Prérequis
-*   [Node.js](https://nodejs.org/) (v16.0.0 ou supérieur recommandé)
-*   [MongoDB](https://www.mongodb.com/) en cours d'exécution localement (port `27017`) ou un URI de base de données MongoDB Atlas
-*   [Flutter SDK](https://docs.flutter.dev/get-started/install) (si vous souhaitez lancer l'application mobile)
+### 1️⃣ Prérequis
+* **Java 8 / Maven** – pour compiler et exécuter le backend Spring Boot.
+* **MongoDB** (local ou Atlas) – base de données utilisée par l’API.
+* **Flutter SDK** – pour lancer l’application mobile.
 
 ---
 
-### 2. Démarrer le Serveur Backend (`backend/`)
+### 2️⃣ Démarrer le Serveur Backend (`backend/`)
 Le serveur tourne par défaut sur `http://localhost:5000`.
 
 ```bash
 # Entrer dans le répertoire backend
 cd backend
 
-# Installer les dépendances
-npm install
-
-# Créer un fichier .env (un modèle par défaut est fourni)
-# Vous pouvez configurer MONGODB_URI et JWT_SECRET si nécessaire
-
-# [CRUCIAL] Initialiser la base de données avec des profils de démonstration
-# Cela générera 5 professionnels avec des scores de réputation variés (de 52 à 98) et des créneaux de consultation !
-npm run seed
-
-# Démarrer le serveur en mode développement (avec rechargement automatique)
-npm run dev
+# Lancer l’application Spring Boot
+mvn spring-boot:run
 ```
+
 
 **Identifiants de test générés par le seed :**
 *   **Patients :**
@@ -145,3 +137,4 @@ La réactivité de l'application est garantie par des choix de conception de bas
 ---
 
 *Développé avec passion pour Mini Docto+*
+# Mini_DoctoPlus

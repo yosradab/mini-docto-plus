@@ -25,3 +25,6 @@ Thumbs.db
 # Misc
 *.tmp
 *.bak
+.dart_tool/
+pubspec.lock
+flutter/

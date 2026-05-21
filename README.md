@@ -140,3 +140,4 @@ La réactivité de l'application est garantie par des choix de conception de bas
 # Mini_DoctoPlus
 # Mini_DoctoPlus
 # Mini_DoctoPlus
+# Mini-docto-plus

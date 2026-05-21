@@ -7,6 +7,6 @@ import java.util.List;
 
 @Repository
 public interface SlotRepository extends MongoRepository<Slot, String> {
-    List<Slot> findByProfessionalId(String professionalId);
-    List<Slot> findByProfessionalIdAndIsBookedFalse(String professionalId);
+    List<Slot> findByPro(String professionalId);
+    List<Slot> findByProAndIsBookedFalse(String professionalId);
 }

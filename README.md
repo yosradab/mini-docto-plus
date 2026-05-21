@@ -8,7 +8,7 @@ Bienvenue dans le projet **Mini Docto+**, une solution full-stack moderne conçu
 
 Le projet est divisé en trois sous-dossiers distincts et autonomes :
 
-1. **`backend/`** : API REST robuste en **Node.js + Express** connectée à **MongoDB** (via Mongoose), avec authentification sécurisée par JWT, contrôle d'accès par rôles et gestion de base de données performante.
+1. **`backend/`** : API REST robuste en **Spring Boot (Java)** connectée à **MongoDB**. Authentification sécurisée par JWT, contrôle d'accès par rôles et gestion de données performante.
 2. **`pro-web/`** : Application web pour les professionnels de santé, construite en **React + Vite** et stylisée avec du **Vanilla CSS ultra-moderne** (thème sombre, glassmorphism, transitions fluides et responsive).
 3. **`patient-mobile/`** : Application mobile et multiplateforme pour les patients, développée en **Flutter** en utilisant le state management **Provider** pour une gestion de flux propre et réactive.
 

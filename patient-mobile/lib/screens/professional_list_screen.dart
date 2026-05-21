@@ -40,7 +40,7 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
   }
 
   Color _getScoreColor(int score) {
-    if (score >= 90) return Colors.emerald;
+    if (score >= 90) return const Color(0xFF10B981); // Tailwind Emerald‑500 equivalent
     if (score >= 75) return Colors.teal;
     if (score >= 60) return Colors.amber.shade800;
     return Colors.deepOrange;

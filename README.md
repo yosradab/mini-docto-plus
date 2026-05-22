@@ -184,3 +184,6 @@ Flutter doit etre valide sur une machine ayant le SDK Flutter installe avec:
 flutter analyze
 flutter test
 ```
+Firebase capture 
+<img width="1919" height="914" alt="image" src="https://github.com/user-attachments/assets/67f61326-ed94-4ff8-a269-380c7c05fcbf" />
+

@@ -8,30 +8,32 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class User {
     @Id
     private String id;
-    
+
     private String name;
-    
+
     @Indexed(unique = true)
     private String email;
-    
+
     private String password;
-    
-    private String role; // "patient" or "pro"
-    
+
+    private Role role; // Enum: PRO or PATIENT
+
     private String specialty; // Only for pros
     private String bio; // Only for pros
     private Integer score; // Only for pros (0-100)
 
+    private String refreshToken;
+
     public User() {}
 
-    public User(String name, String email, String password, String role) {
+    public User(String name, String email, String password, Role role) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
     }
 
-    public User(String name, String email, String password, String role, String specialty, String bio, Integer score) {
+    public User(String name, String email, String password, Role role, String specialty, String bio, Integer score) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -54,8 +56,8 @@ public class User {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
 
     public String getSpecialty() { return specialty; }
     public void setSpecialty(String specialty) { this.specialty = specialty; }
@@ -65,4 +67,7 @@ public class User {
 
     public Integer getScore() { return score; }
     public void setScore(Integer score) { this.score = score; }
+
+    public String getRefreshToken() { return refreshToken; }
+    public void setRefreshToken(String refreshToken) { this.refreshToken = refreshToken; }
 }

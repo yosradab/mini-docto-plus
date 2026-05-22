@@ -225,7 +225,7 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
                                                 vertical: 4,
                                               ),
                                               decoration: BoxDecoration(
-                                                color: Colors.cyan.withOpacity(0.1),
+                                                color: Colors.cyan.withValues(alpha: 0.1),
                                                 borderRadius: BorderRadius.circular(6),
                                               ),
                                               child: Text(
@@ -250,10 +250,10 @@ class _ProfessionalListScreenState extends State<ProfessionalListScreen> {
                                               vertical: 6,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: scoreColor.withOpacity(0.1),
+                                              color: scoreColor.withValues(alpha: 0.1),
                                               borderRadius: BorderRadius.circular(10),
                                               border: Border.all(
-                                                color: scoreColor.withOpacity(0.3),
+                                                color: scoreColor.withValues(alpha: 0.3),
                                                 width: 1.5,
                                               ),
                                             ),

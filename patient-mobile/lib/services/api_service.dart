@@ -2,27 +2,23 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../config/api_config.dart';
 import '../models/user.dart';
 import '../models/slot.dart';
 import '../models/appointment.dart';
 
 class ApiService extends ChangeNotifier {
-  // Détecter si on tourne sur l'émulateur Android (10.0.2.2) ou sur le web/iOS (localhost)
-  static String get baseUrl {
-    if (kIsWeb) {
-      return 'http://localhost:5000/api';
-    }
-    // Pour l'émulateur Android standard, localhost correspond à 10.0.2.2
-    return 'http://10.0.2.2:5000/api'; 
-  }
+  static String get baseUrl => ApiConfig.baseUrl;
 
   String? _token;
   UserModel? _currentUser;
   bool _isLoading = false;
+  bool _sessionLoaded = false;
 
   String? get token => _token;
   UserModel? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
+  bool get sessionLoaded => _sessionLoaded;
   bool get isAuthenticated => _token != null;
 
   ApiService() {
@@ -37,6 +33,7 @@ class ApiService extends ChangeNotifier {
     if (userStr != null) {
       _currentUser = UserModel.fromJson(jsonDecode(userStr));
     }
+    _sessionLoaded = true;
     notifyListeners();
   }
 
@@ -83,7 +80,7 @@ class ApiService extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Register Error: $e');
-      rethrow;
+      _throwConnectionError(e, 'inscription');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -121,11 +118,25 @@ class ApiService extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Login Error: $e');
-      rethrow;
+      _throwConnectionError(e, 'connexion');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Never _throwConnectionError(Object e, String action) {
+    final msg = e.toString().toLowerCase();
+    if (msg.contains('connection refused') ||
+        msg.contains('failed host lookup') ||
+        msg.contains('network is unreachable') ||
+        msg.contains('socketexception')) {
+      throw Exception(
+        'Serveur inaccessible ($action). Démarrez le backend sur le port 5000 '
+        '(URL: $baseUrl).',
+      );
+    }
+    throw e;
   }
 
   Future<void> logout() async {

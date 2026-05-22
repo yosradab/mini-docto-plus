@@ -24,37 +24,39 @@ class MiniDoctoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final apiService = Provider.of<ApiService>(context);
-
-    return MaterialApp(
-      title: 'Mini Docto+',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        fontFamily: 'Roboto',
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.cyan,
-          brightness: Brightness.light,
-          primary: Colors.cyan.shade800,
-          secondary: Colors.cyanAccent.shade700,
-        ),
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black80,
-          elevation: 0,
-          border: Border(
-            bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+    return Consumer<ApiService>(
+      builder: (context, apiService, _) {
+        return MaterialApp(
+          title: 'Mini Docto+',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            useMaterial3: true,
+            fontFamily: 'Roboto',
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.cyan,
+              brightness: Brightness.light,
+              primary: Colors.cyan.shade800,
+              secondary: Colors.cyanAccent.shade700,
+            ),
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black87,
+              elevation: 0,
+            ),
+            cardTheme: const CardThemeData(
+              color: Colors.white,
+              surfaceTintColor: Colors.transparent,
+            ),
           ),
-        ),
-        cardTheme: const CardTheme(
-          color: Colors.white,
-          surfaceTintColor: Colors.transparent,
-        ),
-      ),
-      // Renvoyer vers la liste des professionnels si authentifié, sinon vers le login
-      home: apiService.isAuthenticated 
-          ? const ProfessionalListScreen() 
-          : const LoginScreen(),
+          home: !apiService.sessionLoaded
+              ? const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                )
+              : apiService.isAuthenticated
+                  ? const ProfessionalListScreen()
+                  : const LoginScreen(),
+        );
+      },
     );
   }
 }

@@ -1,143 +1,222 @@
-# 🩺 Mini Docto+ — Test Technique
+# Mini Docto+
 
-Bienvenue dans le projet **Mini Docto+**, une solution full-stack moderne conçue pour mettre en relation les patients et les professionnels de santé. Ce projet a été développé dans le cadre d'un test technique visant à évaluer des compétences d'architecture, de sécurité, de performance et d'ergonomie UX/UI.
+Mini Docto+ est une mini-application de mise en relation entre patients et professionnels de sante.
 
----
+Le projet contient trois applications:
 
-## 🏗️ Architecture du Projet
+- `backend/`: API REST Spring Boot + MongoDB.
+- `pro-web/`: interface web React/Vite pour les professionnels.
+- `patient-mobile/`: application Flutter pour les patients.
 
-Le projet est divisé en trois sous-dossiers distincts et autonomes :
+## Fonctionnalites couvertes
 
-1. **`backend/`** : API REST robuste en **Spring Boot (Java)** connectée à **MongoDB**. Authentification sécurisée par JWT, contrôle d'accès par rôles et gestion de données performante.
-2. **`pro-web/`** : Application web pour les professionnels de santé, construite en **React + Vite** et stylisée avec du **Vanilla CSS ultra-moderne** (thème sombre, glassmorphism, transitions fluides et responsive).
-3. **`patient-mobile/`** : Application mobile et multiplateforme pour les patients, développée en **Flutter** en utilisant le state management **Provider** pour une gestion de flux propre et réactive.
+### Authentification
 
----
+- Inscription et connexion patient (`role: patient`) depuis Flutter.
+- Inscription et connexion professionnel (`role: pro`) depuis React.
+- Authentification par JWT.
+- Routes separees et protegees par role:
+  - `/api/patients/**`: reserve aux patients.
+  - `/api/pros/**`: reserve aux professionnels.
 
-## 📸 Capture d'Écran — Dashboard Firebase & Analytics
+### Patient mobile Flutter
 
-Dans le cadre du suivi des utilisateurs et du taux d'engagement de Mini Docto+, un tableau de bord d'analyse a été mis en œuvre. La capture d'écran ci-dessous représente le dashboard **Firebase / Google Analytics** avec les indicateurs clés de performance (KPI) et les événements personnalisés :
+- Consulter les professionnels disponibles.
+- Afficher les professionnels tries par score decroissant.
+- Consulter les creneaux disponibles d'un professionnel.
+- Reserver un rendez-vous.
+- Consulter ses rendez-vous.
+- Modifier uniquement ses propres rendez-vous.
+- Annuler uniquement ses propres rendez-vous.
+
+### Professionnel web React
+
+- Ajouter des creneaux de disponibilite.
+- Supprimer ses propres creneaux.
+- Consulter les rendez-vous reserves par les patients.
+
+## Prerequis
+
+- Java 17.
+- MongoDB local ou MongoDB Atlas.
+- Node.js + npm.
+- Flutter SDK.
+
+## Configuration backend
+
+Le backend ecoute par defaut sur `http://localhost:5000`.
+
+Fichier: `backend/src/main/resources/application.properties`
+
+```properties
+server.port=5000
+spring.data.mongodb.uri=mongodb://localhost:27017/minidoctoplus
+doctoplus.jwt.secret=doctoplus_secret_key_2026_super_secure_987654321_spring
+doctoplus.jwt.expiration=2592000000
+```
+
+Pour MongoDB Atlas, remplacez `spring.data.mongodb.uri` par l'URL Atlas.
+En production, utilisez une variable d'environnement ou un secret pour la cle JWT.
+
+## Lancer le backend
+
+```bash
+cd backend
+./mvnw spring-boot:run
+```
+
+Sur Windows:
+
+```powershell
+cd backend
+.\mvnw.cmd spring-boot:run
+```
+
+Swagger est disponible sur:
+
+```text
+http://localhost:5000/swagger-ui/index.html
+```
+
+## Lancer l'espace professionnel web
+
+```bash
+cd pro-web
+npm install
+npm run dev
+```
+
+L'application Vite est generalement disponible sur:
+
+```text
+http://localhost:5173
+```
+
+En developpement, vous pouvez utiliser `VITE_API_URL=/api` pour passer par le proxy Vite.
+Pour appeler directement le backend:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+## Lancer l'application patient Flutter
+
+```bash
+cd patient-mobile
+flutter pub get
+flutter run
+```
+
+L'URL API est resolue dans `patient-mobile/lib/config/api_config.dart`:
+
+- Android emulator: `http://10.0.2.2:5000/api`
+- iOS simulator, desktop et web: `http://localhost:5000/api`
+- Appareil physique: lancer avec l'IP locale de votre machine:
+
+```bash
+flutter run --dart-define=API_HOST=192.168.1.10
+```
+
+Remplacez `192.168.1.10` par l'adresse IP locale du PC qui lance le backend.
+
+## Tests et verification
+
+Backend:
+
+```bash
+cd backend
+./mvnw test
+```
+
+Web pro:
+
+```bash
+cd pro-web
+npm run lint
+npm run build
+```
+
+Flutter:
+
+```bash
+cd patient-mobile
+flutter analyze
+flutter test
+```
+
+## Deploiement Vercel
+
+Vercel convient pour deployer `pro-web` uniquement. Le backend Spring Boot doit etre deploye separement, par exemple sur Render, Railway, Fly.io ou un VPS, avec MongoDB Atlas.
+
+Etapes Vercel:
+
+1. Pousser le projet sur GitHub.
+2. Creer un nouveau projet sur Vercel.
+3. Choisir le dossier racine `pro-web`.
+4. Configurer:
+   - Framework Preset: `Vite`
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+5. Ajouter la variable d'environnement:
+
+```env
+VITE_API_URL=https://votre-backend-deploye.com/api
+```
+
+6. Deploy.
+
+Si le backend reste local, l'application Vercel ne pourra pas l'appeler depuis Internet. Il faut une API publique et configurer CORS cote Spring Boot.
+
+## Capture Firebase / Google Analytics
+
+Une capture est deja presente dans le projet:
+
+```text
+firebase_analytics.png
+```
+
+Elle est affichee ci-dessous:
 
 ![Firebase Analytics Dashboard](./firebase_analytics.png)
 
-### 📊 Explication des Événements Trackés :
-*   `patient_registered` / `pro_registered` : Permet de mesurer le ratio d'acquisition entre patients et professionnels.
-*   `appointment_booked` : Déclenché lorsqu'un patient confirme un rendez-vous (calcul du taux de conversion).
-*   `appointment_modified` : Analyse de l'instabilité des rendez-vous (combien de patients modifient leur créneau).
-*   `appointment_cancelled` : Mesure du taux de désistement pour optimiser la disponibilité des médecins.
+Pour faire votre propre capture:
 
----
+1. Ouvrir Firebase Console ou Google Analytics.
+2. Selectionner le projet Mini Docto+.
+3. Aller dans Analytics, Dashboard, Events ou Realtime.
+4. Verifier que les evenements importants apparaissent, par exemple:
+   - `patient_registered`
+   - `pro_registered`
+   - `appointment_booked`
+   - `appointment_modified`
+   - `appointment_cancelled`
+5. Faire une capture d'ecran du tableau et l'ajouter au repo, par exemple `firebase_analytics.png`.
 
-## 🚀 Guide d'Installation et de Démarrage
+## Securite
 
-### 1. Prérequis
-### 1️⃣ Prérequis
-* **Java 8 / Maven** – pour compiler et exécuter le backend Spring Boot.
-* **MongoDB** (local ou Atlas) – base de données utilisée par l’API.
-* **Flutter SDK** – pour lancer l’application mobile.
+- Les mots de passe sont hashes avec BCrypt avant stockage.
+- Les sessions sont stateless et basees sur JWT.
+- Spring Security protege les routes API.
+- Les routes patient et professionnel sont separees par role.
+- Les rendez-vous patient sont filtres par l'utilisateur connecte.
+- La modification et l'annulation d'un rendez-vous verifient que le rendez-vous appartient bien au patient connecte.
+- Les professionnels ne peuvent supprimer que leurs propres creneaux.
+- CORS est configure pour le developpement. En production, il faut remplacer l'origine ouverte par les domaines deployes.
 
----
+## Performance
 
-### 2️⃣ Démarrer le Serveur Backend (`backend/`)
-Le serveur tourne par défaut sur `http://localhost:5000`.
+- MongoDB indexe l'email utilisateur pour eviter les doublons et accelerer la recherche.
+- Les creneaux utilisent un index compose unique `pro + date + startTime` pour eviter les doublons.
+- Les rendez-vous utilisent un index unique sur `slot` pour eviter la double reservation.
+- Le tri des professionnels par score decroissant est fait cote backend via `findByRoleOrderByScoreDesc`, ce qui evite un tri inutile cote mobile.
+- Les reponses API renvoient seulement les informations utiles aux interfaces, sans mot de passe.
 
-```bash
-# Entrer dans le répertoire backend
-cd backend
+## Etat de validation locale
 
-# Lancer l’application Spring Boot
-mvn spring-boot:run
-```
+Commandes verifiees:
 
+- `backend`: `.\mvnw.cmd test`
+- `pro-web`: `npm.cmd run lint`
+- `pro-web`: `npm.cmd run build`
 
-**Identifiants de test générés par le seed :**
-*   **Patients :**
-    *   `jean.dupont@gmail.com` / `password123`
-    *   `marie.curie@gmail.com` / `password123`
-*   **Professionnels (Pros) :**
-    *   `sophie.laurent@doctoplus.fr` / `password123` (Score: 98 - Cardiologue)
-    *   `marc.benhamou@doctoplus.fr` / `password123` (Score: 89 - Pédiatre)
-    *   `leila.belkacem@doctoplus.fr` / `password123` (Score: 78 - Généraliste)
-
----
-
-### 3. Lancer le Dashboard Professionnel (`pro-web/`)
-L'application professionnelle permet aux médecins de s'inscrire, se connecter, définir leurs créneaux et voir les réservations des patients.
-
-```bash
-# Entrer dans le répertoire pro-web
-cd pro-web
-
-# Installer les dépendances
-npm install
-
-# Lancer le serveur de développement Vite
-npm run dev
-```
-Ouvrez l'URL affichée par Vite (généralement `http://localhost:5173`) dans votre navigateur.
-
----
-
-### 4. Lancer l'Application Patient (`patient-mobile/`)
-L'application mobile permet aux patients de consulter les médecins (triés par score), de réserver, de modifier et d'annuler leurs rendez-vous.
-
-```bash
-# Entrer dans le répertoire patient-mobile
-cd patient-mobile
-
-# Récupérer les paquets Flutter
-flutter pub get
-
-# Lancer l'application sur un simulateur ou appareil connecté
-flutter run
-```
-> 💡 **Note pour le développement mobile :** 
-> Dans `lib/services/api_service.dart`, la variable `baseUrl` est configurée pour utiliser dynamiquement `http://10.0.2.2:5000/api` sur l'émulateur Android standard (qui redirige vers le localhost de la machine hôte) et `http://localhost:5000/api` sur simulateur iOS ou support Web.
-
----
-
-## 🔐 Focus Sécurité
-
-La sécurité est un pilier fondamental de Mini Docto+. Plusieurs mécanismes industriels ont été intégrés :
-
-1.  **Chiffrement des Mots de Passe** :
-    *   Utilisation de la bibliothèque `bcryptjs` avec un facteur de coût (Salt) de `10`.
-    *   Le mot de passe n'est jamais stocké en clair. Le chiffrement s'effectue automatiquement via un hook Mongoose `pre('save')` avant l'écriture en base de données.
-    *   La clé de mot de passe est explicitement exclue des requêtes SQL/NoSQL standards via la clause `select: false` du schéma utilisateur.
-
-2.  **Authentification et Autorisation par Rôle (RBAC)** :
-    *   Génération de jetons **JWT (JSON Web Tokens)** sécurisés lors de l'authentification.
-    *   Mise en place de deux middlewares de protection :
-        *   `protect` : Valide la signature du token et extrait l'utilisateur actif de la session.
-        *   `authorize('patient', 'pro')` : Bloque l'accès aux routes spécifiques. Par exemple, un patient ne pourra **jamais** supprimer ou ajouter un créneau de disponibilité, et un médecin ne pourra pas modifier un rendez-vous d'un patient.
-
-3.  **Contrôle strict de Propriété des Données** :
-    *   Sur les routes de modification (`PUT /api/patients/appointments/:id`) et d'annulation (`DELETE /api/patients/appointments/:id`), l'API vérifie systématiquement que l'identifiant du patient connecté correspond exactement au champ `patient` associé au rendez-vous. Cela empêche les attaques d'IDOR (Insecure Direct Object Reference).
-
-4.  **Sécurisation CORS & Entrées** :
-    *   Activation de `cors()` pour restreindre les accès non autorisés provenant d'autres domaines.
-    *   Sanitisation automatique des requêtes et validations strictes de formats (ex: expression régulière pour valider le format de l'email).
-
----
-
-## ⚡ Focus Performance
-
-La réactivité de l'application est garantie par des choix de conception de bases de données et d'échange de données optimisés :
-
-1.  **Indexation de Base de Données MongoDB (Mongoose)** :
-    *   **Index Composé Unique** sur le modèle `Slot` : `{ pro: 1, date: 1, startTime: 1 }` avec contrainte unique. Cela permet une recherche ultra-rapide en temps constant $O(1)$ des disponibilités et empêche la création accidentelle de créneaux en doublons pour le même praticien.
-    *   **Index Unique** sur le modèle `Appointment` : `{ slot: 1 }`. Un créneau horaire ne peut être associé qu'à un seul rendez-vous actif à la fois, éliminant les conflits d'écritures concurrentes (double-réservation).
-
-2.  **Tri Optimal (Score de Réputation)** :
-    *   La fonctionnalité de tri des professionnels par score décroissant s'effectue directement au niveau du serveur de base de données MongoDB (`User.find({ role: 'pro' }).sort({ score: -1 })`). Grâce au moteur MongoDB, ce tri est extrêmement performant et soulage la mémoire du client (React ou Flutter) qui n'a pas à trier les données côté front-end.
-
-3.  **Payloads Légers (Populate Sélectif)** :
-    *   Pour économiser de la bande passante sur mobile, les jointures (`populate`) ne récupèrent que les champs strictement nécessaires. Par exemple, au lieu de charger tout le profil complet d'un médecin lors de l'affichage d'un rendez-vous, l'API ne récupère que `{ name, email, specialty, score }`, évitant de renvoyer le mot de passe chiffré, la date de création ou la biographie longue si elle n'est pas requise.
-
----
-
-*Développé avec passion pour Mini Docto+*
-# Mini_DoctoPlus
-# Mini_DoctoPlus
-# Mini_DoctoPlus
-# Mini-docto-plus
+Flutter n'a pas pu etre execute dans cet environnement car le SDK Flutter n'est pas installe dans le shell utilise. Les commandes a lancer localement sont listees dans la section Tests et verification.

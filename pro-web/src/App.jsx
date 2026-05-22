@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-
-const API_BASE_URL = 'http://localhost:5000/api';
+import { useCallback, useEffect, useState } from 'react';
+import { API_BASE } from './environment';
 
 function App() {
   // Auth states
@@ -35,32 +34,40 @@ function App() {
     }
   }, [alert]);
 
-  // Fetch Slots and Appointments when token is active
-  useEffect(() => {
-    if (token && user && user.role === 'pro') {
-      fetchProSlots();
-      fetchProAppointments();
-    }
-  }, [token, user]);
-
   const showAlert = (message, type = 'success') => {
     setAlert({ message, type });
   };
 
   // --- API OPERATIONS ---
 
+  const parseApiResponse = async (res) => {
+    const text = await res.text();
+    try {
+      return { data: JSON.parse(text), raw: text };
+    } catch {
+      return { data: null, raw: text };
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Échec de la connexion');
+      const { data } = await parseApiResponse(res);
+      if (res.status === 403) {
+        throw new Error(
+          'Accès refusé (403 CORS). Ouvrez pro-web en http://localhost:5173, redémarrez le backend (.\\start.ps1), puis réessayez.',
+        );
+      }
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.message || `Échec de la connexion (${res.status})`);
+      }
 
       if (data.user.role !== 'pro') {
         throw new Error('Cet espace est réservé uniquement aux professionnels de santé.');
@@ -76,7 +83,10 @@ function App() {
       setEmail('');
       setPassword('');
     } catch (err) {
-      showAlert(err.message, 'error');
+      const msg = err.message?.includes('Failed to fetch')
+        ? 'Backend inaccessible. Démarrez le serveur Spring Boot sur le port 5000.'
+        : err.message;
+      showAlert(msg, 'error');
     } finally {
       setLoading(false);
     }
@@ -96,14 +106,21 @@ function App() {
         score: Number(score)
       };
 
-      const res = await fetch(`${API_BASE_URL}/auth/register`, {
+      const res = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Échec de l\'inscription');
+      const { data } = await parseApiResponse(res);
+      if (res.status === 403) {
+        throw new Error(
+          'Accès refusé (403 CORS). Ouvrez pro-web en http://localhost:5173, redémarrez le backend (.\\start.ps1), puis réessayez.',
+        );
+      }
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.message || `Échec de l'inscription (${res.status})`);
+      }
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
@@ -118,7 +135,12 @@ function App() {
       setBio('');
       setIsRegistering(false);
     } catch (err) {
-      showAlert(err.message, 'error');
+      showAlert(
+        err.message?.includes('Failed to fetch')
+          ? 'Backend inaccessible. Démarrez le serveur Spring Boot sur le port 5000.'
+          : err.message,
+        'error',
+      );
     } finally {
       setLoading(false);
     }
@@ -134,9 +156,9 @@ function App() {
     showAlert('Vous avez été déconnecté avec succès.', 'success');
   };
 
-  const fetchProSlots = async () => {
+  const fetchProSlots = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/pros/slots`, {
+      const res = await fetch(`${API_BASE}/pros/slots`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -146,11 +168,11 @@ function App() {
     } catch (err) {
       console.error('Erreur lors du chargement des créneaux:', err);
     }
-  };
+  }, [token]);
 
-  const fetchProAppointments = async () => {
+  const fetchProAppointments = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/pros/appointments`, {
+      const res = await fetch(`${API_BASE}/pros/appointments`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -160,7 +182,19 @@ function App() {
     } catch (err) {
       console.error('Erreur lors du chargement des rendez-vous:', err);
     }
-  };
+  }, [token]);
+
+  // Fetch Slots and Appointments when token is active
+  useEffect(() => {
+    if (token && user && user.role === 'pro') {
+      const timer = window.setTimeout(() => {
+        fetchProSlots();
+        fetchProAppointments();
+      }, 0);
+
+      return () => window.clearTimeout(timer);
+    }
+  }, [fetchProAppointments, fetchProSlots, token, user]);
 
   const handleAddSlot = async (e) => {
     e.preventDefault();
@@ -170,7 +204,7 @@ function App() {
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/pros/slots`, {
+      const res = await fetch(`${API_BASE}/pros/slots`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -200,7 +234,7 @@ function App() {
     if (!window.confirm('Voulez-vous vraiment supprimer cette disponibilité ?')) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/pros/slots/${slotId}`, {
+      const res = await fetch(`${API_BASE}/pros/slots/${slotId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

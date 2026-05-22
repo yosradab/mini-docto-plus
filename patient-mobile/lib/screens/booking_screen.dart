@@ -158,7 +158,7 @@ class _BookingScreenState extends State<BookingScreen> {
                       ),
                       Chip(
                         label: Text('${widget.professional.score}/100'),
-                        backgroundColor: Colors.cyan.withOpacity(0.08),
+                        backgroundColor: Colors.cyan.withValues(alpha: 0.08),
                         labelStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.cyan),
                       ),
                     ],
@@ -232,7 +232,7 @@ class _BookingScreenState extends State<BookingScreen> {
                             ),
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: isSelected
-                                ? [BoxShadow(color: Colors.cyan.withOpacity(0.3), blurRadius: 6)]
+                                ? [BoxShadow(color: Colors.cyan.withValues(alpha: 0.3), blurRadius: 6)]
                                 : [],
                           ),
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -244,7 +244,7 @@ class _BookingScreenState extends State<BookingScreen> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                  color: isSelected ? Colors.white : Colors.black80,
+                                  color: isSelected ? Colors.white : Colors.black87,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
